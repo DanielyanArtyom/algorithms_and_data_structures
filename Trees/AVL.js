@@ -90,7 +90,7 @@ class TreeNode {
   }
 }
 
-class BST {
+class AVL {
   root = null;
 
   proOrderTraverseRecursive() {
@@ -352,6 +352,27 @@ class BST {
     } else {
       treeNode.left = this.#insert(treeNode.left, target);
     }
+
+    let balanceFactor = this.#getBF(treeNode);
+
+    if (balanceFactor > 1 && target < treeNode.left.val) {
+      return this.#rightRotate(treeNode);
+    }
+
+    if (balanceFactor > 1 && target > treeNode.left.val) {
+      treeNode.left = this.#leftRotate(treeNode.left);
+      return this.#rightRotate(treeNode);
+    }
+
+    if (balanceFactor < 1 && target > treeNode.right.val) {
+      return this.#leftRotate(treeNode);
+    }
+
+    if (balanceFactor < 1 && target < treeNode.right.val) {
+      treeNode.right = this.#rightRotate(treeNode.right);
+      return this.#leftRotate(treeNode);
+    }
+
     return treeNode;
   }
 
@@ -384,7 +405,49 @@ class BST {
       treeNode.val = tmp.val;
       treeNode.right = this.#delete(treeNode.right, tmp.val);
     }
+
+    let balanceFactor = this.#getBF(treeNode);
+
+    if (balanceFactor > 1) {
+      if (this.#getBF(treeNode.left) >= 0) {
+        return this.#rightRotate(treeNode);
+      }
+
+      treeNode.left = this.#leftRotate(treeNode.left);
+      return this.#rightRotate(treeNode);
+    }
+
+    if (balanceFactor < -1) {
+      if (this.#getBF(treeNode.right) <= 0) {
+        return this.#leftRotate(treeNode);
+      }
+
+      treeNode.right = this.#rightRotate(treeNode.right);
+      return this.#leftRotate(treeNode);
+    }
+
     return treeNode;
+  }
+
+  #getBF(treeNode) {
+    return this.#getHeight(treeNode.left) - this.#getHeight(treeNode.right);
+  }
+
+  #rightRotate(treeNode) {
+    let leftSide = treeNode.left;
+    let rightSide = leftSide.right;
+    leftSide.right = treeNode;
+    treeNode.left = rightSide;
+    return leftSide;
+  }
+
+  #leftRotate(treeNode) {
+    let rightSide = treeNode.right;
+    let leftSide = treeNode.left;
+    rightSide.left = treeNode;
+    treeNode.right = leftSide;
+
+    return rightSide;
   }
 
   levelTraversePrintList() {
