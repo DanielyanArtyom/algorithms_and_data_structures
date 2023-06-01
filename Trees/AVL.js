@@ -237,12 +237,13 @@ class AVL {
 
     return this.#getMinimum(treeNode.left);
   }
+  
   #getMaximum(treeNode) {
     if (!treeNode.right) {
       return treeNode;
     }
 
-    return this.#getMinimum(treeNode.right);
+    return this.#getMaximum(treeNode.right);
   }
 
   getHeight(target) {
