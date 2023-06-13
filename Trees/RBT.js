@@ -75,8 +75,8 @@ class RBT {
   NIL = null;
 
   constructor() {
-    this.root = null;
-    this.NIL = new TreeNode(null, TreeColors.BLACK);
+    this.NIL = new TreeNode(null, TreeColors.BLACK, null);
+    this.root = this.NIL;
   }
 
   levelOrderTraversal() {
@@ -87,10 +87,10 @@ class RBT {
     queue.push(this.root);
     while (queue.size()) {
       let size = queue.size();
-
+      let strToPrint = "";
       while (size !== 0) {
         let current = queue.pop();
-        console.log(`val: ${current.val}, color: ${current.color}`);
+        strToPrint += `  val: ${current.val}, color: ${current.color}`;
         if (current.left && current.left.val !== null) {
           queue.push(current.left);
         }
@@ -99,6 +99,7 @@ class RBT {
         }
         --size;
       }
+      console.log(strToPrint);
     }
     queue.empty();
   }
@@ -112,7 +113,7 @@ class RBT {
     }
     y.parent = treeNode.parent;
 
-    if (treeNode.parent !== this.NIL) {
+    if (treeNode.parent === this.NIL) {
       this.root = y;
     } else if (treeNode === treeNode.parent.left) {
       treeNode.parent.left = y;
@@ -128,7 +129,8 @@ class RBT {
     let y = treeNode.right;
 
     treeNode.right = y.left;
-    if (y !== this.NIL && y.left !== this.NIL) {
+
+    if (y.left !== this.NIL) {
       y.left.parent = treeNode;
     }
     y.parent = treeNode.parent;
@@ -141,8 +143,9 @@ class RBT {
       treeNode.parent.right = y;
     }
     y.left = treeNode;
+
     treeNode.parent = y;
-    console.log(y.left.val);
+    console.log("here after", y.val);
   }
 
   insert(key) {
@@ -157,7 +160,7 @@ class RBT {
     let y = this.NIL;
     let x = this.root;
 
-    while (x && x !== this.NIL) {
+    while (x !== this.NIL) {
       y = x;
       if (newTreeNode.val < x.val) {
         x = x.left;
@@ -165,17 +168,23 @@ class RBT {
         x = x.right;
       }
     }
-
     newTreeNode.parent = y;
 
     if (y === this.NIL) {
       this.root = newTreeNode;
+      if (!this.NIL.left && !this.NIL.right) {
+        this.NIL.left = this.root;
+        this.NIL.right = this.root;
+      }
     } else if (newTreeNode.val < y.val) {
       y.left = newTreeNode;
     } else {
       y.right = newTreeNode;
     }
-    this.#RBInsertionFixup(newTreeNode);
+
+    if (newTreeNode.parent.parent !== this.NIL) {
+      this.#RBInsertionFixup(newTreeNode);
+    }
   }
 
   #RBInsertionFixup(treeNode) {
@@ -209,10 +218,13 @@ class RBT {
           treeNode = treeNode.parent.parent;
         } else {
           // uncle is black
+
           if (treeNode === treeNode.parent.left) {
             treeNode = treeNode.parent;
+
             this.rightRotate(treeNode);
           }
+
           treeNode.parent.color = TreeColors.BLACK;
           treeNode.parent.parent.color = TreeColors.RED;
           this.leftRotate(treeNode);
@@ -227,7 +239,7 @@ class RBT {
   }
 
   #search(treeNode, target) {
-    if (!treeNode) {
+    if (treeNode === this.NIL) {
       return null;
     }
     if (treeNode.val === target) {
@@ -251,7 +263,11 @@ class RBT {
   }
 
   delete(target) {
-    let nodeToDelete = this.#search(target);
+    let nodeToDelete = this.search(target);
+
+    if (!nodeToDelete) {
+      return null;
+    }
 
     let y = nodeToDelete;
 
@@ -355,7 +371,7 @@ class RBT {
   }
 
   #getMinimum(treeNode) {
-    if (!treeNode.left) {
+    if (treeNode.left === this.NIL) {
       return treeNode;
     }
 
@@ -368,6 +384,18 @@ let rbt = new RBT();
 rbt.insert(7);
 rbt.insert(8);
 rbt.insert(12);
-// rbt.insert(45);
-// rbt.insert(2);
+rbt.insert(45);
+rbt.insert(2);
+rbt.insert(6);
+rbt.insert(13);
+rbt.insert(58);
+rbt.insert(0);
+console.log("insertion traversal");
+rbt.levelOrderTraversal();
+
+rbt.delete(45);
+rbt.delete(0);
+rbt.delete(13);
+
+console.log("deletion traversal");
 rbt.levelOrderTraversal();
