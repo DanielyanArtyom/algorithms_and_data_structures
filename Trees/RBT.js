@@ -23,7 +23,6 @@ class Queue {
     }
 
     let poppedElement = this._queue[0];
-
     this._queue = tmpArray;
     return poppedElement;
   }
@@ -71,28 +70,32 @@ class TreeNode {
   }
 }
 
-class RBG {
+class RBT {
   root = null;
-  NIL = new TreeColors(null, TreeColors.BLACK);
+  NIL = null;
+
+  constructor() {
+    this.root = null;
+    this.NIL = new TreeNode(null, TreeColors.BLACK);
+  }
 
   levelOrderTraversal() {
-    if (!root) {
+    if (!this.root) {
       return "Tree is empty";
     }
     let queue = new Queue();
-    queue.push(root);
+    queue.push(this.root);
     while (queue.size()) {
       let size = queue.size();
+
       while (size !== 0) {
         let current = queue.pop();
-        if (current) {
-          console.log(`val: ${current.val}, color: ${current.color}`);
-          if (current.left) {
-            queue.push(current.left);
-          }
-          if (current.right) {
-            queue.push(current.right);
-          }
+        console.log(`val: ${current.val}, color: ${current.color}`);
+        if (current.left && current.left.val !== null) {
+          queue.push(current.left);
+        }
+        if (current.right && current.right.val !== null) {
+          queue.push(current.right);
         }
         --size;
       }
@@ -123,24 +126,23 @@ class RBG {
 
   leftRotate(treeNode) {
     let y = treeNode.right;
-    treeNode.right = y.left;
 
-    if (y.left !== this.NIL) {
+    treeNode.right = y.left;
+    if (y !== this.NIL && y.left !== this.NIL) {
       y.left.parent = treeNode;
     }
-
     y.parent = treeNode.parent;
 
-    if (treeNode.parent !== this.NIL) {
+    if (treeNode.parent === this.NIL) {
       this.root = y;
     } else if (treeNode === treeNode.parent.left) {
       treeNode.parent.left = y;
     } else {
       treeNode.parent.right = y;
     }
-
     y.left = treeNode;
     treeNode.parent = y;
+    console.log(y.left.val);
   }
 
   insert(key) {
@@ -155,7 +157,7 @@ class RBG {
     let y = this.NIL;
     let x = this.root;
 
-    while (x !== this.NIL) {
+    while (x && x !== this.NIL) {
       y = x;
       if (newTreeNode.val < x.val) {
         x = x.left;
@@ -167,22 +169,19 @@ class RBG {
     newTreeNode.parent = y;
 
     if (y === this.NIL) {
-      y.left = newTreeNode;
+      this.root = newTreeNode;
     } else if (newTreeNode.val < y.val) {
       y.left = newTreeNode;
     } else {
       y.right = newTreeNode;
     }
-    if (newTreeNode.parent.parent !== this.NIL) {
-      this.#RBInsertionFixup(newTreeNode);
-    }
+    this.#RBInsertionFixup(newTreeNode);
   }
 
   #RBInsertionFixup(treeNode) {
     while (treeNode.parent.color === TreeColors.RED) {
       if (treeNode.parent === treeNode.parent.parent.left) {
-        let uncleNode = z.parent.parent.right;
-
+        let uncleNode = treeNode.parent.parent.right;
         if (uncleNode.color === TreeColors.RED) {
           // case 1
           treeNode.parent.color = TreeColors.BLACK;
@@ -202,6 +201,7 @@ class RBG {
         }
       } else {
         let uncleNode = treeNode.parent.parent.left;
+
         if (uncleNode.color === TreeColors.RED) {
           treeNode.parent.color = TreeColors.BLACK;
           uncleNode.color = TreeColors.BLACK;
@@ -218,9 +218,8 @@ class RBG {
           this.leftRotate(treeNode);
         }
       }
-
-      this.root.color = TreeColors.BLACK;
     }
+    this.root.color = TreeColors.BLACK;
   }
 
   search(target) {
@@ -242,7 +241,7 @@ class RBG {
 
   #transplant(u, v) {
     if (u.parent === this.NIL) {
-      root = v;
+      this.root = v;
     } else if (u === u.parent.left) {
       u.parent.left = v;
     } else {
@@ -288,7 +287,7 @@ class RBG {
     }
   }
 
-  deleteFixup(x) {
+  #deleteFixup(x) {
     while (x !== this.root && x.color === TreeColors.BLACK) {
       if (x === x.parent.left) {
         let brotherNode = x.parent.right;
@@ -363,3 +362,12 @@ class RBG {
     return this.#getMinimum(treeNode.left);
   }
 }
+
+let rbt = new RBT();
+
+rbt.insert(7);
+rbt.insert(8);
+rbt.insert(12);
+// rbt.insert(45);
+// rbt.insert(2);
+rbt.levelOrderTraversal();
