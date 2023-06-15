@@ -56,8 +56,8 @@ class TreeNode {
   val = null;
 
   constructor(
-    val,
-    color = TreeColors.RED,
+    val = null,
+    color = TreeColors.BLACK,
     parent = null,
     left = null,
     right = null
@@ -75,8 +75,8 @@ class RBT {
   NIL = null;
 
   constructor() {
-    this.NIL = new TreeNode(null, TreeColors.BLACK, null);
-    this.root = this.NIL;
+    this.NIL = new TreeNode();
+    this.root = this.NIL
   }
 
   levelOrderTraversal() {
@@ -143,9 +143,7 @@ class RBT {
       treeNode.parent.right = y;
     }
     y.left = treeNode;
-
     treeNode.parent = y;
-    console.log("here after", y.val);
   }
 
   insert(key) {
@@ -169,13 +167,8 @@ class RBT {
       }
     }
     newTreeNode.parent = y;
-
     if (y === this.NIL) {
       this.root = newTreeNode;
-      if (!this.NIL.left && !this.NIL.right) {
-        this.NIL.left = this.root;
-        this.NIL.right = this.root;
-      }
     } else if (newTreeNode.val < y.val) {
       y.left = newTreeNode;
     } else {
@@ -206,7 +199,7 @@ class RBT {
           }
           treeNode.parent.color = TreeColors.BLACK;
           treeNode.parent.parent.color = TreeColors.RED;
-          this.rightRotate(treeNode);
+          this.rightRotate(treeNode.parent.parent);
         }
       } else {
         let uncleNode = treeNode.parent.parent.left;
@@ -221,13 +214,12 @@ class RBT {
 
           if (treeNode === treeNode.parent.left) {
             treeNode = treeNode.parent;
-
             this.rightRotate(treeNode);
           }
 
           treeNode.parent.color = TreeColors.BLACK;
           treeNode.parent.parent.color = TreeColors.RED;
-          this.leftRotate(treeNode);
+          this.leftRotate(treeNode.parent.parent);
         }
       }
     }
@@ -284,7 +276,7 @@ class RBT {
       y_original_color = y.color;
       x = y.right;
 
-      if (x.parent === nodeToDelete) {
+      if (y.parent === nodeToDelete) {
         x.parent = y;
       } else {
         this.#transplant(y, y.right);
@@ -390,12 +382,11 @@ rbt.insert(6);
 rbt.insert(13);
 rbt.insert(58);
 rbt.insert(0);
-console.log("insertion traversal");
-rbt.levelOrderTraversal();
+// console.log("insertion traversal");
+// rbt.levelOrderTraversal();
 
 rbt.delete(45);
-rbt.delete(0);
-rbt.delete(13);
+// rbt.delete(0);
+// rbt.delete(13);
 
-console.log("deletion traversal");
 rbt.levelOrderTraversal();
