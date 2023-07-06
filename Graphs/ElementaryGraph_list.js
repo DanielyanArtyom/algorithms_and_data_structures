@@ -82,11 +82,13 @@ class Stack {
 
 class ElementaryGraph {
   _adjacencyList = null;
+  _transposedList = null;
   _isDirectedGraph = false;
 
   constructor(isDirected = false) {
     this._adjacencyList = [];
     this._isDirectedGraph = isDirected;
+    this._transposedList = [];
   }
 
   bfs(source) {
@@ -154,9 +156,11 @@ class ElementaryGraph {
 
   addVertex(vertexCount) {
     //  generating graph without edges
-
-    for (let i = 0; i <= vertexCount; ++i) {
+    for (let i = 0; i < vertexCount; ++i) {
       this._adjacencyList[i] = [];
+      if (this._isDirectedGraph) {
+        this._transposedList[i] = [];
+      }
     }
   }
 
@@ -169,7 +173,7 @@ class ElementaryGraph {
     }
 
     if (this._isDirectedGraph) {
-      // this._adjacencyList[v].push(source)
+      this._transposedList[destination].push(source);
       this._adjacencyList[source].push(destination);
     } else {
       this._adjacencyList[source].push(destination);
@@ -188,6 +192,10 @@ class ElementaryGraph {
     while (queue.size()) {
       let tmpVertex = queue.pop();
 
+      if (tmpVertex === destination) {
+        return this.#shortestPath(tmpVertex, destination);
+      }
+
       this._adjacencyList[tmpVertex].forEach((neighbor) => {
         if (!visitedVertexes[neighbor]) {
           queue.push(tmpVertex);
@@ -195,10 +203,6 @@ class ElementaryGraph {
 
           if (parent[neighbor] === -1) {
             parent[neighbor] = tmpVertex;
-          }
-
-          if (neighbor === destination) {
-            return this.#shortestPath(source, destination);
           }
         }
       });
@@ -288,7 +292,7 @@ class ElementaryGraph {
         }
       }
     });
-    recursiveStack[neighbor] = false;
+    recursiveStack[source] = false;
     return false;
   }
 
@@ -311,5 +315,92 @@ class ElementaryGraph {
       }
     });
     sorted.unshift(vertex);
+  }
+
+  khansAlgorithm() {
+    let inOrder = Array(this._adjacencyList.length).fill(0);
+    let idx = 0;
+    let inDegree = Array(this._adjacencyList.length).fill(0);
+    let queue = new Queue();
+
+    for (let i = 0; i < this._adjacencyList.length; ++i) {
+      this._adjacencyList[i].forEach((vertex) => {
+        ++inDegree[vertex];
+      });
+    }
+
+    for (let i = 0; i < inDegree.length; ++i) {
+      if (inDegree[i] === 0) {
+        queue.push(i);
+      }
+    }
+
+    while (queue.size()) {
+      let vertex = queue.pop();
+      inOrder[idx++] = vertex;
+      this._adjacencyList[vertex].forEach((neighbor) => {
+        --inDegree[neighbor];
+
+        if (inDegree[neighbor] === 0) {
+          queue.push(neighbor);
+        }
+      });
+    }
+    if (idx !== inDegree.length) {
+      return "Cycle detected";
+    }
+    return inOrder;
+  }
+
+  kosarajusAlgorithm() {
+    let visitedVertexes = Array(this._adjacencyList.length).fill(false);
+    let stack = new Stack();
+    let scc = [];
+
+    for (i = 0; i < this._adjacencyList.length; ++i) {
+      if (!visitedVertexes) {
+      }
+    }
+  }
+
+  tarjansAlghorithm() {
+    let ids = Array(this._adjacencyList.length).fill(-1);
+    let lowLink = Array(this._adjacencyList.length).fill(0);
+    let onStack = Array(this._adjacencyList.length).fill(false);
+    let stack = new Stack();
+
+    for (let i = 0; i < this._adjacencyList.length; ++i) {
+      if (ids[i] === -1) {
+        this.#tarjansAlghorithmDfs(i, stack, onStack, ids, lowLink);
+      }
+    }
+  }
+
+  #tarjansAlghorithmDfs(source, stack, onStack, ids, lowLink) {
+    stack.push(source);
+
+    onStack[source] = true;
+    let id = 0;
+
+    ids[source] = lowLink[source] = id++;
+    this._adjacencyList[source].forEach((neighbor) => {
+      if (ids[neighbor] === -1) {
+        this.#tarjansAlghorithmDfs(neighbor, stack, onStack, ids, lowLink);
+      }
+      if (onStack[neighbor]) {
+        lowLink[source] = Math.min(lowLink[source], lowLink[neighbor]);
+      }
+    });
+
+    if (lowLink[source] === ids[source]) {
+      for (let vertex = stack.top(); ; vertex = stack.top()) {
+        stack.pop();
+        onStack[vertex] = false;
+        if (vertex === source) {
+          break;
+        }
+      }
+    }
+    // do something
   }
 }
