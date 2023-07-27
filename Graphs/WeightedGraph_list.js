@@ -22,14 +22,14 @@ class Queue {
       tmpArray[i - 1] = this._queue[i];
     }
 
-    let poppendElement = this._queue[0];
+    let poppendElement = this._queue.vertex;
 
     this._queue = tmpArray;
     return poppendElement;
   }
 
   front() {
-    return this._queue[0];
+    return this._queue.vertex;
   }
   back() {
     return this._queue[this._queue.length - 1];
@@ -107,11 +107,23 @@ class Graph {
 
   addEdge(source, destination) {
     if (this._isDirectedGraph) {
-      this._transposedList[destination].push([source, this.getRandomInt()]);
-      this.adjList[source].push([destination, this.getRandomInt()]);
+      this._transposedList[destination].push({
+        vertex: source,
+        cost: this.getRandomInt(),
+      });
+      this.adjList[source].push({
+        vertex: destination,
+        cost: this.getRandomInt(),
+      });
     } else {
-      this.adjList[source].push([destination, this.getRandomInt()]);
-      this.adjList[destination].push([source, this.getRandomInt()]);
+      this.adjList[source].push({
+        vertex: destination,
+        cost: this.getRandomInt(),
+      });
+      this.adjList[destination].push({
+        vertex: source,
+        cost: this.getRandomInt(),
+      });
     }
   }
 
@@ -123,12 +135,12 @@ class Graph {
     while (queue.size()) {
       let poppedElement = queue.pop();
       this.adjList[poppedElement].forEach((neighbor) => {
-        if (!visitedElements[neighbor[0]]) {
-          queue.push(neighbor[0]);
+        if (!visitedElements[neighbor.vertex]) {
+          queue.push(neighbor.vertex);
           console.log(
-            `neighbor bfs vertex:  ${neighbor[0]}, neighbor bfs weight: ${neighbor[1]}`
+            `neighbor bfs vertex:  ${neighbor.vertex}, neighbor bfs weight: ${neighbor.cost}`
           );
-          visitedElements[neighbor[0]] = true;
+          visitedElements[neighbor.vertex] = true;
         }
       });
     }
@@ -141,12 +153,12 @@ class Graph {
     while (stack.size()) {
       let poppedElement = stack.pop();
       this.adjList[poppedElement].forEach((neighbor) => {
-        if (!visitedElements[neighbor[0]]) {
-          stack.push(neighbor[0]);
+        if (!visitedElements[neighbor.vertex]) {
+          stack.push(neighbor.vertex);
           console.log(
-            `current dfs vertex: ${neighbor[0]}, neighbor vertex weight is: ${neighbor[1]}`
+            `current dfs vertex: ${neighbor.vertex}, neighbor vertex weight is: ${neighbor.cost}`
           );
-          visitedElements[neighbor[0]] = true;
+          visitedElements[neighbor.vertex] = true;
         }
       });
     }
@@ -175,11 +187,11 @@ class Graph {
   #dfs(source, visitedArray) {
     visitedArray[source] = true;
     this.adjList[source].forEach((neighbor) => {
-      if (!visitedArray[neighbor[0]]) {
+      if (!visitedArray[neighbor.vertex]) {
         console.log(
-          `current dfs vertex: ${neighbor[0]}, neighbor vertex weight is: ${neighbor[1]}`
+          `current dfs vertex: ${neighbor.vertex}, neighbor vertex weight is: ${neighbor.cost}`
         );
-        this.#dfs(neighbor[0], visitedArray);
+        this.#dfs(neighbor.vertex, visitedArray);
       }
     });
   }
@@ -197,8 +209,8 @@ class Graph {
     }
 
     this.adjList[source].forEach((neighbor) => {
-      if (!visitedVertexes[neighbor[0]]) {
-        this.#allPossiblePaths(neighbor[0], destination, visitedVertexes);
+      if (!visitedVertexes[neighbor.vertex]) {
+        this.#allPossiblePaths(neighbor.vertex, destination, visitedVertexes);
       }
     });
     visitedVertexes[source] = false;
@@ -221,8 +233,8 @@ class Graph {
     visitedVertexes[source] = true;
 
     this.adjList[source].forEach((neighbor) => {
-      if (!visitedVertexes[neighbor[0]]) {
-        if (this.#isCycle(neighbor[0], visitedVertexes, source[0])) {
+      if (!visitedVertexes[neighbor.vertex]) {
+        if (this.#isCycle(neighbor.vertex, visitedVertexes, source.vertex)) {
           return true;
         } else if (neighbor !== prevVertex) {
           return true;
@@ -252,15 +264,48 @@ class Graph {
     visited[source] = true;
 
     this.adjList[source].forEach((neighbor) => {
-      if (!visited[neighbor[0]]) {
-        if (this.#isCycleDirectedGraph(neighbor[0], visited, recursiveStack)) {
+      if (!visited[neighbor.vertex]) {
+        if (
+          this.#isCycleDirectedGraph(neighbor.vertex, visited, recursiveStack)
+        ) {
           return true;
-        } else if (recursiveStack[neighbor[0]]) {
+        } else if (recursiveStack[neighbor.vertex]) {
           return true;
         }
       }
     });
     recursiveStack[source] = false;
     return false;
+  }
+
+  dijkstrasAlgorithm(source) {
+    let pq = new PriorityQueue();
+    const visitedElements = Array(this.adjList.length).fill(false);
+    let distance = Array(this.adjList.length).fill(Number.POSITIVE_INFINITY);
+    distance[source] = 0;
+    pq.push({
+      vertex: source,
+      cost: 0,
+    });
+
+    while (!pq.isEmpty()) {
+      const { vertex, cost } = pq.pop();
+      visitedElements[vertex] = true;
+      this.adjList.forEach((neihbor) => {
+        if (!visited[neihbor]) {
+          let newDistance =
+            distance[vertex] + this.adjList[vertex][neihbor].cost;
+
+          if (newDistance < distance[neihbor.vertex]) {
+            distance[vertex] = newDistance;
+            pq.push({
+              vertex: neihbor.vertex,
+              cost: newDistance,
+            });
+          }
+        }
+      });
+    }
+    return distance;
   }
 }
