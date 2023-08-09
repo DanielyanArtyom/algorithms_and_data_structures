@@ -7,4 +7,4 @@ function towersOfHanos(n, a, b, c) {
   console.log(`${a} -> ${c}`);
   towersOfHanos(n - 1, b, a, c);
 }
-// towersOfHanos(3, "A", "B", "C");
+towersOfHanos(3, "A", "B", "C");
