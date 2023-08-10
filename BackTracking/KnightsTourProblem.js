@@ -20,10 +20,10 @@ const generateBoard = () => {
 
 const printBoard = (board) => {
   let str = "";
-  for (let x = 0; x < BoardLength; x++) {
-    for (let y = 0; y < BoardLength; y++) {
-      str += `${board[x][y]}, `;
-      if (y === 7) {
+  for (let row = 0; row < BoardLength; row++) {
+    for (let col = 0; col < BoardLength; col++) {
+      str += `${board[row][y]}, `;
+      if (col === 7) {
         console.log(`${str}`);
         str = "";
       }

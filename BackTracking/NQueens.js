@@ -43,10 +43,10 @@ const helper = (row, col, board, columns, positiveDiag, negativeDiag) => {
 
 const printBoard = (BoardLength, board) => {
   let str = "";
-  for (let x = 0; x < BoardLength; x++) {
-    for (let y = 0; y < BoardLength; y++) {
-      str += `${board[x][y]}, `;
-      if (y === 7) {
+  for (let row = 0; row < BoardLength; row++) {
+    for (let col = 0; col < BoardLength; col++) {
+      str += `${board[row][col]}, `;
+      if (col === BoardLength - 1) {
         console.log(`${str}`);
         str = "";
       }
@@ -65,4 +65,4 @@ const nQueens = (n) => {
   printBoard(n, board);
 };
 
-nQueens(16);
+nQueens(4);
