@@ -290,6 +290,11 @@ class Graph {
 
     while (!pq.isEmpty()) {
       const { vertex, cost } = pq.pop();
+
+      if (cost > distance[vertex]) {
+        continue;
+      }
+
       visitedElements[vertex] = true;
       this.adjList.forEach((neihbor) => {
         if (!visited[neihbor]) {
