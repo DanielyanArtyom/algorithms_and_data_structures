@@ -56,4 +56,29 @@ class DisjoinSet {
       root1.parent = root2;
     }
   }
+
+  kruskalAlgorithm(graph, source) {
+    let edges = [];
+
+    for (let i = 0; i < graph.length; ++i) {
+      for (let j = 0; j < graph[i].length; ++j) {
+        edges.push({
+          source: i,
+          dest: graph[i][j].vertex,
+          cost: graph[i][j].cost,
+        });
+      }
+    }
+
+    edges.sort((a, b) => a.cost - b.cost);
+    let cost = 0;
+
+    for (key of edges) {
+      const { source, dest } = key;
+      if (this.findSet(source) !== this.findSet(dest)) {
+        cost += key.cost;
+        this.unify(source, dest);
+      }
+    }
+  }
 }

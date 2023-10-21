@@ -313,4 +313,67 @@ class Graph {
     }
     return distance;
   }
+
+  primAlgorithm(source) {
+    let pq = new PriorityQueue();
+    pq.push({ vertex: source, cost: 0 });
+    let visited = Array(this.adjList.length).fill(false);
+    let count = 0;
+
+    while (!pq.isEmpty()) {
+      const { vertex, cost } = pq.pop();
+      if (visited[vertex]) {
+        visited[vertex] = true;
+        count += cost;
+        this.adjList[vertex].forEach((neighbor) => {
+          if (!visited[neighbor.vertex]) {
+            pq.push({ vertex: neighbor.vertex, cost: neighbor.cost });
+          }
+        });
+      }
+    }
+
+    return count;
+  }
+
+  bellmanFordAlgorithm(source) {
+    const dist = new Array(this.adjList.length - 1).fill(
+      Number.MAX_SAFE_INTEGER
+    );
+    dist[source] = 0;
+
+    let edges = [];
+
+    for (let i = 0; i < this.adjList.length; ++i) {
+      for (let j = 0; j < this.adjList[i].length; ++j) {
+        edges.push({
+          src: i,
+          dest: this.adjList[i][j].vertex,
+          cost: this.adjList[i][j].cost,
+        });
+      }
+    }
+
+    for (let ind = 0; ind < this.adjList.length - 1; ind++) {
+      for (let { src, dest, cost } of edges) {
+        if (
+          dist[src] !== Number.MAX_SAFE_INTEGER &&
+          dist[src] + cost < dist[dest]
+        ) {
+          dist[dest] = dist[src] + cost;
+        }
+      }
+    }
+    // nth relaxation to check negative cycle
+    for (let { src, dest, cost } of edges) {
+      if (
+        dist[src] !== Number.MAX_SAFE_INTEGER &&
+        dist[src] + cost < dist[dest]
+      ) {
+        return [-1];
+      }
+    }
+
+    return dist;
+  }
 }
